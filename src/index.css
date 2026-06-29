@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand */
+  --color-teal:         #207771;
+  --color-teal-deep:    #00625C;
+  --color-teal-mid:     #1A8A82;
+  --color-teal-soft:    #91CEBF;
+  --color-teal-tint:    rgba(32,119,113,0.05);
+  --color-teal-mist:    rgba(32,119,113,0.03);
+  --color-teal-border:  rgba(32,119,113,0.15);
+
+  /* Ink */
+  --color-ink:          #131818;
+  --color-ink-soft:     #313847;
+  --color-text:         #3A4545;
+  --color-muted:        #5A6B6B;
+  --color-faint:        #8A9999;
+
+  /* Surface */
+  --color-bg:           #F5FAFA;
+  --color-bg-warm:      #FAFAFA;
+  --color-surface:      #FFFFFF;
+  --color-surface-soft: #FBFCFB;
+  --color-hairline:     #DDE3E6;
+  --color-hairline-soft:#E8EDEE;
+  --color-panel:        #EEF2F3;
+  --color-panel-deep:   #E2E7EA;
+
+  /* Semantic */
+  --color-green:        #2D7A4F;
+  --color-green-soft:   #E4F1EA;
+  --color-amber:        #9C6F1E;
+  --color-amber-soft:   #F5ECDB;
+  --color-rose:         #9C5252;
+  --color-rose-soft:    #F1E4E4;
+
+  /* Layout */
+  --sidebar-width: 248px;
+  --topbar-height: 56px;
+
+  /* Typography */
+  --font-display: "Inter Tight", "Inter", system-ui, sans-serif;
+  --font-sans:    "Inter", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; padding: 0; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 60px #ffffff inset !important;
+  box-shadow: 0 0 0 60px #ffffff inset !important;
+  -webkit-text-fill-color: #303030 !important;
+  caret-color: #1A8A82 !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-hairline); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+
+:focus-visible { outline: 2px solid var(--color-teal); outline-offset: 2px; }
+
+button { cursor: pointer; border: none; background: none; padding: 0; font: inherit; }
+a, button { transition: color 0.15s, background-color 0.15s, border-color 0.15s, opacity 0.15s; }
+.font-mono, code, kbd, pre, samp { font-family: var(--font-mono); }
