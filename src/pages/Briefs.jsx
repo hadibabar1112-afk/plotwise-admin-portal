@@ -14,7 +14,7 @@ function BriefRow({ campaign, navigate }) {
   const BsIcon = bs.icon;
   return (
     <button
-      onClick={() => navigate("campaign-detail", { campaignId: campaign.id })}
+      onClick={() => navigate("brief-detail", { campaignId: campaign.id })}
       className="w-full flex items-center gap-4 px-5 py-4 text-left hover:opacity-80 transition-all"
       style={{ borderBottom: "1px solid " + C.hairlineSoft }}
     >
@@ -67,7 +67,14 @@ export default function Briefs({ navigate }) {
           <h1 className="text-[26px] font-semibold leading-tight" style={{ color: C.ink, fontFamily: "var(--font-display)", letterSpacing: "-0.025em" }}>Briefs</h1>
           <p className="text-[13px] mt-1" style={{ color: C.muted }}>Manage creator briefs across all campaigns.</p>
         </div>
-        <button className="flex items-center gap-2 h-9 px-4 rounded-xl text-[13px] font-semibold text-white" style={{ backgroundColor: C.tealDeep }}>
+        <button
+          onClick={() => {
+            const first = CAMPAIGNS.find(c => c.briefStatus === "not-started") || CAMPAIGNS[0];
+            navigate("brief-detail", { campaignId: first.id });
+          }}
+          className="flex items-center gap-2 h-9 px-4 rounded-xl text-[13px] font-semibold text-white"
+          style={{ backgroundColor: C.tealDeep }}
+        >
           <Plus className="w-4 h-4" strokeWidth={2.5} /> Create Brief
         </button>
       </div>

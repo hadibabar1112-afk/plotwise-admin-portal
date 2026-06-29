@@ -16,6 +16,7 @@ import CampaignDetail from "./pages/CampaignDetail";
 import Research from "./pages/Research";
 import ResearchDetail from "./pages/ResearchDetail";
 import Briefs from "./pages/Briefs";
+import BriefDetail from "./pages/BriefDetail";
 import Production from "./pages/Production";
 import ProductionDetail from "./pages/ProductionDetail";
 import Payments from "./pages/Payments";
@@ -76,6 +77,8 @@ export default function App() {
         return <ResearchDetail navigate={navigate} context={context} />;
       case "briefs":
         return <Briefs navigate={navigate} />;
+      case "brief-detail":
+        return <BriefDetail campaignId={context.campaignId} navigate={navigate} />;
       case "production":
         return <Production navigate={navigate} />;
       case "production-detail":
