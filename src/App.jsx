@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { C } from "./constants/colors";
+import Login from "./pages/Login";
 import Sidebar from "./components/Sidebar";
 import TopBar from "./components/TopBar";
 import Overview from "./pages/Overview";
@@ -24,6 +25,7 @@ import Messages from "./pages/Messages";
 import Settings from "./pages/Settings";
 
 export default function App() {
+  const [authed, setAuthed] = useState(false);
   const [section, setSection] = useState("overview");
   const [context, setContext] = useState({});
   const [toast, setToast] = useState(null);
@@ -93,6 +95,8 @@ export default function App() {
         return <Overview navigate={navigate} />;
     }
   }
+
+  if (!authed) return <Login onLogin={() => setAuthed(true)} />;
 
   return (
     <div className="min-h-screen flex" style={{ backgroundColor: C.bg }}>
