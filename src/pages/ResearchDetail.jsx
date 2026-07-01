@@ -38,6 +38,12 @@ const STAGE_COLORS = {
 
 const TEMPLATES = {
   customer: {
+    whoEnabled: true,
+    painEnabled: true,
+    desiresEnabled: true,
+    beliefsEnabled: true,
+    vocabEnabled: true,
+    hangoutsEnabled: true,
     headline: "The [Archetype] — she [core frustration].",
     distillation: "She [emotional state]. She wants to [core desire] — [what that means for her].",
     pain: [
@@ -75,6 +81,11 @@ const TEMPLATES = {
     { name: "[Third Competitor]",       positioning: "[How they talk about their product]", gap: "[The gap we fill that they can't]",             enabled: false },
   ],
   offer: {
+    productEnabled: true,
+    ingredientsEnabled: true,
+    mechanismEnabled: true,
+    proofEnabled: true,
+    differentiationEnabled: true,
     headline: "[Product Name]",
     price: "$[X]",
     keyIngredients: [
@@ -107,6 +118,12 @@ function normalizeSection(id, raw) {
   if (!raw) return null;
   switch (id) {
     case "customer": return {
+      whoEnabled:      raw.whoEnabled      ?? true,
+      painEnabled:     raw.painEnabled     ?? true,
+      desiresEnabled:  raw.desiresEnabled  ?? true,
+      beliefsEnabled:  raw.beliefsEnabled  ?? true,
+      vocabEnabled:    raw.vocabEnabled    ?? true,
+      hangoutsEnabled: raw.hangoutsEnabled ?? true,
       headline:     raw.headline || "",
       distillation: raw.distillation || "",
       pain:     (raw.pain     || []).map(norm),
@@ -117,7 +134,15 @@ function normalizeSection(id, raw) {
     };
     case "beliefs":    return raw.map(b => ({ enabled: true, ...b }));
     case "competitor": return raw.map(c => ({ enabled: true, ...c }));
-    case "offer":      return { ...raw, keyIngredients: (raw.keyIngredients || []).map(norm) };
+    case "offer":      return {
+      ...raw,
+      productEnabled:         raw.productEnabled         ?? true,
+      ingredientsEnabled:     raw.ingredientsEnabled     ?? true,
+      mechanismEnabled:       raw.mechanismEnabled        ?? true,
+      proofEnabled:           raw.proofEnabled            ?? true,
+      differentiationEnabled: raw.differentiationEnabled  ?? true,
+      keyIngredients: (raw.keyIngredients || []).map(norm),
+    };
     case "angles":     return raw.map(a => ({ enabled: true, ...a }));
     case "hooks":      return raw.map(h => ({ enabled: true, ...h }));
     default: return raw;
@@ -149,15 +174,20 @@ function HiddenBadge() {
   );
 }
 
-function SectionCard({ title, children, dimmed = false }) {
+function SectionCard({ title, children, dimmed = false, enabled, onToggle }) {
+  const isDisabled = enabled === false;
   return (
     <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: C.surface, border: "1px solid " + C.hairline, opacity: dimmed ? 0.5 : 1 }}>
       {title && (
-        <div className="px-5 py-2.5" style={{ borderBottom: "1px solid " + C.hairlineSoft, backgroundColor: C.bgWarm }}>
-          <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: C.faint, letterSpacing: "0.12em" }}>{title}</span>
+        <div className="px-5 py-2.5 flex items-center justify-between" style={{ borderBottom: "1px solid " + C.hairlineSoft, backgroundColor: isDisabled ? C.panel : C.bgWarm }}>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: C.faint, letterSpacing: "0.12em" }}>{title}</span>
+            {isDisabled && !onToggle && <HiddenBadge />}
+          </div>
+          {onToggle !== undefined && <ToggleBtn enabled={enabled ?? true} onToggle={onToggle} />}
         </div>
       )}
-      <div className="p-5">{children}</div>
+      <div className="p-5" style={{ opacity: isDisabled ? 0.4 : 1 }}>{children}</div>
     </div>
   );
 }
@@ -224,12 +254,12 @@ function NullState({ label, onEdit }) {
 function CustomerView({ data }) {
   return (
     <div className="space-y-4">
-      <SectionCard title="Who She Is">
+      <SectionCard title="Who She Is" enabled={data.whoEnabled}>
         <div className="text-[16px] font-semibold mb-2" style={{ color: C.ink }}>{data.headline}</div>
         <p className="text-[13px] leading-relaxed" style={{ color: C.text }}>{data.distillation}</p>
       </SectionCard>
       <div className="grid grid-cols-2 gap-4">
-        <SectionCard title="Pain Points">
+        <SectionCard title="Pain Points" enabled={data.painEnabled}>
           <div className="space-y-2.5">
             {(data.pain || []).map((item, i) => (
               <div key={i} className="flex items-start gap-2.5" style={{ opacity: item.enabled ? 1 : 0.45 }}>
@@ -240,7 +270,7 @@ function CustomerView({ data }) {
             ))}
           </div>
         </SectionCard>
-        <SectionCard title="Desires">
+        <SectionCard title="Desires" enabled={data.desiresEnabled}>
           <div className="space-y-2.5">
             {(data.desires || []).map((item, i) => (
               <div key={i} className="flex items-start gap-2.5" style={{ opacity: item.enabled ? 1 : 0.45 }}>
@@ -253,7 +283,7 @@ function CustomerView({ data }) {
         </SectionCard>
       </div>
       {(data.beliefs || []).length > 0 && (
-        <SectionCard title="What She Believes">
+        <SectionCard title="What She Believes" enabled={data.beliefsEnabled}>
           <div className="space-y-2.5">
             {data.beliefs.map((item, i) => (
               <div key={i} className="flex items-start gap-2.5" style={{ opacity: item.enabled ? 1 : 0.45 }}>
@@ -266,7 +296,7 @@ function CustomerView({ data }) {
         </SectionCard>
       )}
       {(data.vocab || []).length > 0 && (
-        <SectionCard title="Her Vocabulary">
+        <SectionCard title="Her Vocabulary" enabled={data.vocabEnabled}>
           <div className="space-y-0">
             {data.vocab.map((v, i) => (
               <div key={i} className="flex items-center gap-4 py-2.5" style={{ borderBottom: i < data.vocab.length - 1 ? "1px solid " + C.hairlineSoft : "none", opacity: v.enabled ? 1 : 0.45 }}>
@@ -279,7 +309,7 @@ function CustomerView({ data }) {
         </SectionCard>
       )}
       {(data.hangouts || []).length > 0 && (
-        <SectionCard title="Where She Hangs Out">
+        <SectionCard title="Where She Hangs Out" enabled={data.hangoutsEnabled}>
           <div className="flex flex-wrap gap-2">
             {data.hangouts.map((h, i) => (
               <span key={i} className="text-[12px] px-3 py-1 rounded-full" style={{ backgroundColor: h.enabled ? C.panel : C.bgWarm, color: h.enabled ? C.text : C.faint, border: h.enabled ? "none" : "1px dashed " + C.hairline, opacity: h.enabled ? 1 : 0.55 }}>
@@ -302,14 +332,14 @@ function CustomerEdit({ data, onChange }) {
 
   return (
     <div className="space-y-4">
-      <SectionCard title="Who She Is">
+      <SectionCard title="Who She Is" enabled={data.whoEnabled} onToggle={() => upd("whoEnabled", !data.whoEnabled)}>
         <div className="space-y-3">
           <FieldInput label="Headline" value={data.headline} onChange={v => upd("headline", v)} placeholder="The [Archetype] — she [core frustration]." />
           <FieldInput label="Distillation" value={data.distillation} onChange={v => upd("distillation", v)} multiline rows={3} placeholder="She [emotional state]. She wants..." />
         </div>
       </SectionCard>
       <div className="grid grid-cols-2 gap-4">
-        <SectionCard title="Pain Points">
+        <SectionCard title="Pain Points" enabled={data.painEnabled} onToggle={() => upd("painEnabled", !data.painEnabled)}>
           <div className="space-y-2">
             {data.pain.map((item, i) => (
               <EditRow key={i} value={item.text} enabled={item.enabled} onChange={v => updItem("pain", i, "text", v)} onToggle={() => toggle("pain", i)} onRemove={() => remove("pain", i)} placeholder="A pain point..." dotColor={C.rose} />
@@ -317,7 +347,7 @@ function CustomerEdit({ data, onChange }) {
           </div>
           <AddBtn label="Add pain point" onClick={() => add("pain", { text: "" })} />
         </SectionCard>
-        <SectionCard title="Desires">
+        <SectionCard title="Desires" enabled={data.desiresEnabled} onToggle={() => upd("desiresEnabled", !data.desiresEnabled)}>
           <div className="space-y-2">
             {data.desires.map((item, i) => (
               <EditRow key={i} value={item.text} enabled={item.enabled} onChange={v => updItem("desires", i, "text", v)} onToggle={() => toggle("desires", i)} onRemove={() => remove("desires", i)} placeholder="A desire..." dotColor={C.green} />
@@ -326,7 +356,7 @@ function CustomerEdit({ data, onChange }) {
           <AddBtn label="Add desire" onClick={() => add("desires", { text: "" })} />
         </SectionCard>
       </div>
-      <SectionCard title="What She Believes">
+      <SectionCard title="What She Believes" enabled={data.beliefsEnabled} onToggle={() => upd("beliefsEnabled", !data.beliefsEnabled)}>
         <div className="space-y-2">
           {data.beliefs.map((item, i) => (
             <EditRow key={i} value={item.text} enabled={item.enabled} onChange={v => updItem("beliefs", i, "text", v)} onToggle={() => toggle("beliefs", i)} onRemove={() => remove("beliefs", i)} placeholder="A belief she holds..." dotColor={C.amber} />
@@ -334,7 +364,7 @@ function CustomerEdit({ data, onChange }) {
         </div>
         <AddBtn label="Add belief" onClick={() => add("beliefs", { text: "" })} />
       </SectionCard>
-      <SectionCard title="Her Vocabulary">
+      <SectionCard title="Her Vocabulary" enabled={data.vocabEnabled} onToggle={() => upd("vocabEnabled", !data.vocabEnabled)}>
         <div className="space-y-2">
           {data.vocab.map((v, i) => (
             <div key={i} className="flex items-center gap-2 px-3 py-2.5 rounded-xl" style={{ backgroundColor: v.enabled ? C.bgWarm : C.panel, border: "1px solid " + C.hairlineSoft }}>
@@ -348,7 +378,7 @@ function CustomerEdit({ data, onChange }) {
         </div>
         <AddBtn label="Add vocabulary" onClick={() => add("vocab", { hers: "", category: "" })} />
       </SectionCard>
-      <SectionCard title="Where She Hangs Out">
+      <SectionCard title="Where She Hangs Out" enabled={data.hangoutsEnabled} onToggle={() => upd("hangoutsEnabled", !data.hangoutsEnabled)}>
         <div className="space-y-2">
           {data.hangouts.map((h, i) => (
             <EditRow key={i} value={h.text} enabled={h.enabled} onChange={v => updItem("hangouts", i, "text", v)} onToggle={() => toggle("hangouts", i)} onRemove={() => remove("hangouts", i)} placeholder="Platform or community..." dotColor={C.teal} />
@@ -477,12 +507,12 @@ function CompetitorEdit({ data, onChange }) {
 function OfferView({ data }) {
   return (
     <div className="space-y-4">
-      <SectionCard title="Product">
+      <SectionCard title="Product" enabled={data.productEnabled}>
         <div className="text-[22px] font-semibold mb-1" style={{ color: C.ink, fontFamily: "var(--font-display)" }}>{data.headline}</div>
         <div className="text-[15px] font-semibold" style={{ color: C.teal }}>{data.price}</div>
       </SectionCard>
       <div className="grid grid-cols-2 gap-4">
-        <SectionCard title="Key Ingredients">
+        <SectionCard title="Key Ingredients" enabled={data.ingredientsEnabled}>
           <div className="space-y-2">
             {(data.keyIngredients || []).map((k, i) => (
               <div key={i} className="flex items-center gap-2" style={{ opacity: k.enabled ? 1 : 0.4 }}>
@@ -493,14 +523,14 @@ function OfferView({ data }) {
             ))}
           </div>
         </SectionCard>
-        <SectionCard title="Mechanism">
+        <SectionCard title="Mechanism" enabled={data.mechanismEnabled}>
           <p className="text-[13px] leading-relaxed" style={{ color: C.text }}>{data.mechanism}</p>
         </SectionCard>
       </div>
-      <SectionCard title="Proof">
+      <SectionCard title="Proof" enabled={data.proofEnabled}>
         <p className="text-[13px] leading-relaxed" style={{ color: C.text }}>{data.proof}</p>
       </SectionCard>
-      <SectionCard title="Differentiation">
+      <SectionCard title="Differentiation" enabled={data.differentiationEnabled}>
         <p className="text-[13px] leading-relaxed" style={{ color: C.text }}>{data.differentiation}</p>
       </SectionCard>
     </div>
@@ -516,15 +546,13 @@ function OfferEdit({ data, onChange }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <SectionCard title="Product Name">
-          <FieldInput value={data.headline} onChange={v => upd("headline", v)} placeholder="[Product name]" />
-        </SectionCard>
-        <SectionCard title="Price">
-          <FieldInput value={data.price} onChange={v => upd("price", v)} placeholder="$XX" />
-        </SectionCard>
-      </div>
-      <SectionCard title="Key Ingredients">
+      <SectionCard title="Product" enabled={data.productEnabled} onToggle={() => upd("productEnabled", !data.productEnabled)}>
+        <div className="grid grid-cols-2 gap-3">
+          <FieldInput label="Product Name" value={data.headline} onChange={v => upd("headline", v)} placeholder="[Product name]" />
+          <FieldInput label="Price" value={data.price} onChange={v => upd("price", v)} placeholder="$XX" />
+        </div>
+      </SectionCard>
+      <SectionCard title="Key Ingredients" enabled={data.ingredientsEnabled} onToggle={() => upd("ingredientsEnabled", !data.ingredientsEnabled)}>
         <div className="space-y-2">
           {(data.keyIngredients || []).map((k, i) => (
             <EditRow key={i} value={k.text} enabled={k.enabled} onChange={v => updIng(i, "text", v)} onToggle={() => toggleIng(i)} onRemove={() => removeIng(i)} placeholder="Ingredient + concentration..." dotColor={C.teal} />
@@ -532,13 +560,13 @@ function OfferEdit({ data, onChange }) {
         </div>
         <AddBtn label="Add ingredient" onClick={addIng} />
       </SectionCard>
-      <SectionCard title="Mechanism">
+      <SectionCard title="Mechanism" enabled={data.mechanismEnabled} onToggle={() => upd("mechanismEnabled", !data.mechanismEnabled)}>
         <FieldInput value={data.mechanism} onChange={v => upd("mechanism", v)} multiline rows={3} placeholder="[How the product actually works — mechanism, not feature list]" />
       </SectionCard>
-      <SectionCard title="Proof">
+      <SectionCard title="Proof" enabled={data.proofEnabled} onToggle={() => upd("proofEnabled", !data.proofEnabled)}>
         <FieldInput value={data.proof} onChange={v => upd("proof", v)} multiline rows={2} placeholder="[Clinical study, customer data, or third-party validation]" />
       </SectionCard>
-      <SectionCard title="Differentiation">
+      <SectionCard title="Differentiation" enabled={data.differentiationEnabled} onToggle={() => upd("differentiationEnabled", !data.differentiationEnabled)}>
         <FieldInput value={data.differentiation} onChange={v => upd("differentiation", v)} multiline rows={2} placeholder="[What makes this uniquely positioned vs. every competitor]" />
       </SectionCard>
     </div>
